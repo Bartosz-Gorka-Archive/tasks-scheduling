@@ -45,12 +45,17 @@ def main():
             # Read instances
             next(file)  # Skip task counter
 
+            # Tasks dictionary with values
+            tasks = {}
+
             current_line = 1
             while current_line < how_many_records:
                 current_line += 1
                 line = file.readline().strip()
-                values = re.sub("\\s+", ' ', line).split(' ')
-                print(values)
+                values = re.sub('\s+', ' ', line).split(' ')
+                int_values = [int(i) for i in values]
+                tasks.update({str(current_line - 2): int_values})
+
     else:
         print('RUN as main.py FILE_NUMBER K H')
 
