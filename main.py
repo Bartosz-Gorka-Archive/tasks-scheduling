@@ -34,6 +34,10 @@ def calculate_due_date(times, h):
     return int(floor(times * float(h)))
 
 
+def calculate_penalties(tasks, due_date):
+    return sum([val[1] * max(due_date - (val[0] + val[3]), 0) + val[2] * max((val[0] + val[3]) - due_date, 0) for val in tasks.values()])
+
+
 def main():
     if validate_arguments(sys.argv) and validate_file_name(sys.argv[1]) and \
             validate_instance_no(sys.argv[2]) and validate_param_h(sys.argv[3]):
@@ -73,6 +77,17 @@ def main():
         # Calculate due date value
         due_date_value = calculate_due_date(sum_tasks_times, sys.argv[3])
         print(f'Due date value = {due_date_value}')
+
+        # Fake tasks scheduling
+        scheduled = {}
+        for (key, value) in tasks.items():
+            times = value
+            times.append(value[0] + value[1])
+            scheduled.update({key: times})
+
+        scheduled_tasks_penalties = calculate_penalties(scheduled, due_date_value)
+        print(scheduled.values())
+        print(f'Penalties = {scheduled_tasks_penalties}')
 
     else:
         print('RUN as main.py FILE_NUMBER K H')
