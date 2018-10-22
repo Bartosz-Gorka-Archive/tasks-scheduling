@@ -2,6 +2,7 @@ import sys
 import re
 from os import path
 from numpy import sum
+from numpy import floor
 
 
 # CONSTANTS
@@ -27,6 +28,10 @@ def validate_param_h(h):
 
 def calculate_sum_times(tasks):
     return sum([time[0] for time in tasks.values()])
+
+
+def calculate_due_date(times, h):
+    return int(floor(times * float(h)))
 
 
 def main():
@@ -63,6 +68,11 @@ def main():
 
         # Total tasks times (sum)
         sum_tasks_times = calculate_sum_times(tasks)
+        print(f'Tasks total time = {sum_tasks_times}')
+
+        # Calculate due date value
+        due_date_value = calculate_due_date(sum_tasks_times, sys.argv[3])
+        print(f'Due date value = {due_date_value}')
 
     else:
         print('RUN as main.py FILE_NUMBER K H')
