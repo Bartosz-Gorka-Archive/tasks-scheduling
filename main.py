@@ -1,6 +1,7 @@
 import sys
 import re
 from os import path
+from numpy import sum
 
 
 # CONSTANTS
@@ -24,10 +25,17 @@ def validate_param_h(h):
     return h in ['0.2', '0.4', '0.6', '0.8']
 
 
+def calculate_sum_times(tasks):
+    return sum([time[0] for time in tasks.values()])
+
+
 def main():
     if validate_arguments(sys.argv) and validate_file_name(sys.argv[1]) and \
             validate_instance_no(sys.argv[2]) and validate_param_h(sys.argv[3]):
         file_path = path.join(FILE_PATH, 'sch' + sys.argv[1] + '.txt')
+
+        # Tasks dictionary with values
+        tasks = {}
 
         with open(file_path) as file:
             next(file)  # Skip first line from file with number of instances
@@ -45,9 +53,6 @@ def main():
             # Read instances
             next(file)  # Skip task counter
 
-            # Tasks dictionary with values
-            tasks = {}
-
             current_line = 1
             while current_line < how_many_records:
                 current_line += 1
@@ -55,6 +60,9 @@ def main():
                 values = re.sub('\s+', ' ', line).split(' ')
                 int_values = [int(i) for i in values]
                 tasks.update({str(current_line - 2): int_values})
+
+        # Total tasks times (sum)
+        sum_tasks_times = calculate_sum_times(tasks)
 
     else:
         print('RUN as main.py FILE_NUMBER K H')
