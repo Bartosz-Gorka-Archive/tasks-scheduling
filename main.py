@@ -70,6 +70,10 @@ def main():
                 int_values = [int(i) for i in values]
                 tasks.update({str(current_line - 2): int_values})
 
+        print('Tasks details')
+        for (key, value) in tasks.items():
+            print(f' Task {int(key) + 1} => {value}')
+
         # Total tasks times (sum)
         sum_tasks_times = calculate_sum_times(tasks)
         print(f'Tasks total time = {sum_tasks_times}')
@@ -80,9 +84,11 @@ def main():
 
         # Fake tasks scheduling
         scheduled = {}
+        time = 0
         for (key, value) in tasks.items():
             times = value
-            times.append(value[0] + value[1])
+            times.append(time)
+            time += value[0]
             scheduled.update({key: times})
 
         scheduled_tasks_penalties = calculate_penalties(scheduled, due_date_value)
