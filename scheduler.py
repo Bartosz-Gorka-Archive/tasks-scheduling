@@ -1,5 +1,6 @@
 import re
 import sys
+from time import time
 from operator import itemgetter
 from numpy import sum, floor, delete
 
@@ -105,7 +106,11 @@ class Scheduler:
         self.read_tasks()
         self.calculate_sum_times()
         self.calculate_due_date()
+
+        start = time()
         best_scheduled, goal_value, start_time_line = self.shedule_shift_and_verify()
+        print(time() - start, 's')
+
         self.write_to_file(best_scheduled, start_time_line, goal_value)
 
     def read_tasks(self):
