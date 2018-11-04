@@ -1,6 +1,7 @@
 import re
 import sys
-from numpy import sum, floor
+from operator import itemgetter
+from numpy import sum, floor, delete
 
 
 def writeln(stream, content):
@@ -57,25 +58,54 @@ class Scheduler:
 
         return result
 
-    def shift_and_verify(self, tasks):
+    def shedule_shift_and_verify(self):
         min_value = sys.maxsize
         best_start_time = None
+        ordered_tasks = None
 
         for start in range(0, self.due_date):
-            value = self.calculate_penalties(tasks, start)
+            ordered = []
+            sorted_tasks = self.sort_before_due_date()
+
+            # Order tasks before due date line
+            used_tasks = []
+            time = 0
+            for index, task in enumerate(sorted_tasks):
+                time += task['p']
+                if time > self.due_date:
+                    break
+                ordered.append(task)
+                used_tasks.append(index)
+
+            # Remove used tasks from list and sort it
+            tasks_to_schedule = delete(sorted_tasks, used_tasks)
+            sorted_tasks = self.sort_after_due_date(tasks_to_schedule)
+
+            # Order tasks after due date
+            [ordered.append(task) for task in sorted_tasks]
+
+            # Calculate goal function value
+            value = self.calculate_penalties(ordered, start)
             if value < min_value:
                 min_value = value
                 best_start_time = start
+                ordered_tasks = ordered.copy()
 
-        return min_value, best_start_time
+        return ordered_tasks, min_value, best_start_time
+
+    def sort_before_due_date(self):
+        sorder_by_max_b_ratio_first = sorted(self.original_tasks, key=itemgetter('b_ratio'), reverse=True)
+        return sorted(sorder_by_max_b_ratio_first, key=itemgetter('a_ratio'))
+
+    def sort_after_due_date(self, tasks):
+        sorder_by_min_a_ratio_first = sorted(tasks, key=itemgetter('a_ratio'))
+        return sorted(sorder_by_min_a_ratio_first, key=itemgetter('b_ratio'), reverse=True)
 
     def run_processing(self):
         self.read_tasks()
         self.calculate_sum_times()
         self.calculate_due_date()
-        # TODO run scheduling
-        best_scheduled = self.original_tasks
-        goal_value, start_time_line = self.shift_and_verify(best_scheduled)
+        best_scheduled, goal_value, start_time_line = self.shedule_shift_and_verify()
         self.write_to_file(best_scheduled, start_time_line, goal_value)
 
     def read_tasks(self):
