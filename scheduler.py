@@ -57,14 +57,25 @@ class Scheduler:
 
         return result
 
+    def shift_and_verify(self, tasks):
+        min_value = sys.maxsize
+        best_start_time = None
+
+        for start in range(0, self.due_date):
+            value = self.calculate_penalties(tasks, start)
+            if value < min_value:
+                min_value = value
+                best_start_time = start
+
+        return min_value, best_start_time
+
     def run_processing(self):
         self.read_tasks()
         self.calculate_sum_times()
         self.calculate_due_date()
         # TODO run scheduling
         best_scheduled = self.original_tasks
-        start_time_line = 0
-        goal_value = self.calculate_penalties(best_scheduled, start_time_line)
+        goal_value, start_time_line = self.shift_and_verify(best_scheduled)
         self.write_to_file(best_scheduled, start_time_line, goal_value)
 
     def read_tasks(self):
