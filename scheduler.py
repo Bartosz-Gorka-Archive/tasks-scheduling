@@ -64,7 +64,7 @@ class Scheduler:
         best_start_time = None
         ordered_tasks = None
 
-        for start in range(0, self.due_date):
+        for start in range(0, int(self.due_date / 3)):
             ordered = []
             sorted_tasks = self.sort_before_due_date()
 
@@ -109,7 +109,8 @@ class Scheduler:
 
         start = time()
         best_scheduled, goal_value, start_time_line = self.shedule_shift_and_verify()
-        print(time() - start, 's')
+        total = time() - start
+        print(f'{total * 1000}'.replace('.', ','))
 
         self.write_to_file(best_scheduled, start_time_line, goal_value)
 
