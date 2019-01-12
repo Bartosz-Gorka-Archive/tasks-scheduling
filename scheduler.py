@@ -256,6 +256,7 @@ class Scheduler:
                 val = [int(i) for i in re.sub('\s+', ' ', line).split(' ')]
                 current_line += 1
                 self.original_tasks.append({
+                'id': current_line - 2,
                 'p': val[0],
                 'a': val[1],
                 'b': val[2],
