@@ -59,6 +59,48 @@ class Scheduler:
 
         return result
 
+    def schedule_from_due_date_percentage(self):
+        """Split 50-50 percentage and schedule"""
+        # Extra variables with lists - to store calculations
+        ordered = []
+        used_tasks = []
+
+        # Sort task on list
+        sorted_tasks = self.sort_before_due_date()
+
+        # We want split it 50-50 - first part before, second after due date
+        # Reversed also to start from due date
+        first_part = sorted_tasks[0:int(self.n/2)]
+        first_part.reverse()
+
+        # Start in due date
+        time = self.due_date
+
+        # Iterations over tasks
+        for index, task in enumerate(first_part):
+            time -= task['p']
+            if time < 0:
+                time -= task['p']
+                break
+
+            ordered.append(task)
+            used_tasks.append(index)
+
+        # Reverse tasks because started from due date
+        ordered.reverse()
+
+        # Remove used tasks from list and sort it
+        tasks_to_schedule = delete(sorted_tasks, used_tasks)
+        sorted_tasks = self.sort_after_due_date(tasks_to_schedule)
+
+        # Order tasks after due date
+        [ordered.append(task) for task in sorted_tasks]
+
+        # Calculate goal function value
+        value = self.calculate_penalties(ordered, time)
+        return ordered, value, time
+
+
     def shedule_shift_and_verify(self):
         min_value = sys.maxsize
         best_start_time = None
