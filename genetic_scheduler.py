@@ -8,11 +8,11 @@ class GeneticScheduler():
         self.n = n
         self.due_date = due_date
         self.max_epochs = 1000
-        self.populations_after_tournament = 10
-        self.populations_on_epoch_start = self.populations_after_tournament * 10
-        self.mutation_rate = 0.1
+        self.populations_after_tournament = 5
+        self.populations_on_epoch_start = self.populations_after_tournament * 4
+        self.mutation_rate = 0.20
         self.mutation_percentage = int(self.mutation_rate * 100)
-        self.max_time_in_seconds = 65
+        self.max_time_in_seconds = 60
 
     def mutation(self, sequence):
         # Copy sequence to enable change indexes of elements
