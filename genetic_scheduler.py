@@ -60,3 +60,20 @@ class GeneticScheduler():
 
         # Now we should return only winners
         return [population for index, population in enumerate(populations) if index in enabled_indexes]
+
+    def crossover(self, population_1, population_2):
+        # Random index of crossover point
+        # Min one task before or after this point
+        point = randint(1, self.n - 1)
+
+        # Prepare two new sequences
+        new_seq_1 = population_1[0:point].copy()
+        new_seq_2 = population_2[0:point].copy()
+
+        used_in_seq_1 = [task['id'] for task in new_seq_1]
+        used_in_seq_2 = [task['id'] for task in new_seq_2]
+
+        [new_seq_1.append(task) for task in population_2 if task['id'] not in used_in_seq_1]
+        [new_seq_2.append(task) for task in population_1 if task['id'] not in used_in_seq_2]
+
+        return new_seq_1, new_seq_2
