@@ -6,19 +6,23 @@ class GeneticScheduler():
     def __init__(self, n, due_date):
         self.n = n
         self.due_date = due_date
+        self.max_epochs = 2
         self.populations_after_tournament = 10
+        self.populations_on_epoch_start = self.populations_after_tournament * 10
+        self.mutation_rate = 0.1
+        self.mutation_percentage = int(self.mutation_rate * 100)
 
     def mutation(self, sequence):
         # Copy sequence to enable change indexes of elements
         new_sequence = sequence.copy()
 
         # Random indexes
-        first_index = randint(0, self.n)
-        second_index = randint(0, self.n)
+        first_index = randint(0, self.n - 1)
+        second_index = randint(0, self.n - 1)
 
         # Ensure not the same tasks mutated
         while first_index == second_index:
-            second_index = randint(0, self.n)
+            second_index = randint(0, self.n - 1)
 
         # Store temp task and prepare mutation
         task = new_sequence[first_index]
@@ -77,3 +81,55 @@ class GeneticScheduler():
         [new_seq_2.append(task) for task in population_1 if task['id'] not in used_in_seq_2]
 
         return new_seq_1, new_seq_2
+
+    def next_epoch(self, populations):
+        # Calculate how many populations we have now
+        populations_count = len(populations)
+        print('Populations before:', str(populations_count))
+
+        while populations_count < self.populations_on_epoch_start:
+            enabled_indexes = list(range(0, populations_count))
+            first_index = choice(enabled_indexes)
+            second_index = choice(enabled_indexes)
+
+            while first_index == second_index:
+                second_index = choice(enabled_indexes)
+
+            new_seq_1, new_seq_2 = self.crossover(populations[first_index], populations[second_index])
+            populations.append(new_seq_1)
+            populations.append(new_seq_2)
+            populations_count += 2
+
+        print('Populations after:', str(populations_count))
+
+        # Each population can prepare mutation
+        for index, population in enumerate(populations):
+            if randint(0, 100) < self.mutation_percentage:
+                # TODO Now as replacement, but maybe as new population?
+                print('Population {} mutated'.format(index))
+                populations[index] = self.mutation(population)
+
+        # Run tournament and return winners
+        return self.tournament(populations)
+
+    def schedule(self, previous_populations):
+        # Add first basic populations from previous algorithms
+        populations = previous_populations.copy()
+
+        # Start zero epoch (required to seed populations) and iterate it
+        current_epoch = 0
+        while current_epoch <= self.max_epochs:
+            populations = self.next_epoch(populations)
+            current_epoch += 1
+            # TODO add time calculations and break loop when > 1 min
+
+        # Store original tournament winners count as temp
+        temp_tournament_winners = self.populations_after_tournament
+
+        # Select only one winner - this is response
+        self.populations_after_tournament = 1
+        winner = self.tournament(populations)[0]
+        self.populations_after_tournament = temp_tournament_winners
+
+        # Return best sequence
+        return winner
