@@ -1,16 +1,18 @@
 from shifter import Shifter
 from random import randint, choice
+from time import time
 
 
 class GeneticScheduler():
     def __init__(self, n, due_date):
         self.n = n
         self.due_date = due_date
-        self.max_epochs = 2
+        self.max_epochs = 1000
         self.populations_after_tournament = 10
         self.populations_on_epoch_start = self.populations_after_tournament * 10
         self.mutation_rate = 0.1
         self.mutation_percentage = int(self.mutation_rate * 100)
+        self.max_time_in_seconds = 65
 
     def mutation(self, sequence):
         # Copy sequence to enable change indexes of elements
@@ -85,7 +87,6 @@ class GeneticScheduler():
     def next_epoch(self, populations):
         # Calculate how many populations we have now
         populations_count = len(populations)
-        print('Populations before:', str(populations_count))
 
         while populations_count < self.populations_on_epoch_start:
             enabled_indexes = list(range(0, populations_count))
@@ -100,13 +101,10 @@ class GeneticScheduler():
             populations.append(new_seq_2)
             populations_count += 2
 
-        print('Populations after:', str(populations_count))
-
         # Each population can prepare mutation
         for index, population in enumerate(populations):
             if randint(0, 100) < self.mutation_percentage:
                 # TODO Now as replacement, but maybe as new population?
-                print('Population {} mutated'.format(index))
                 populations[index] = self.mutation(population)
 
         # Run tournament and return winners
@@ -116,12 +114,14 @@ class GeneticScheduler():
         # Add first basic populations from previous algorithms
         populations = previous_populations.copy()
 
+        # Start time store - we have X minutes
+        start_time = time()
+
         # Start zero epoch (required to seed populations) and iterate it
         current_epoch = 0
-        while current_epoch <= self.max_epochs:
+        while (time() - start_time) < self.max_time_in_seconds and current_epoch <= self.max_epochs:
             populations = self.next_epoch(populations)
             current_epoch += 1
-            # TODO add time calculations and break loop when > 1 min
 
         # Store original tournament winners count as temp
         temp_tournament_winners = self.populations_after_tournament
