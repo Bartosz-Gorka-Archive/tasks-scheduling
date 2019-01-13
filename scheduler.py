@@ -28,20 +28,20 @@ class Scheduler():
         time = self.due_date
 
         # Iterations over tasks
-        for index, task in enumerate(first_part):
+        for task in first_part:
             time -= task['p']
             if time < 0:
                 time -= task['p']
                 break
 
             ordered.append(task)
-            used_tasks.append(index)
+            used_tasks.append(task['id'])
 
         # Reverse tasks because started from due date
         ordered.reverse()
 
         # Remove used tasks from list and sort it
-        tasks_to_schedule = delete(sorted_tasks, used_tasks)
+        tasks_to_schedule = [task for task in sorted_tasks if task['id'] not in used_tasks]
         sorted_tasks = self.sort_after_due_date(tasks_to_schedule)
 
         # Order tasks after due date
@@ -77,20 +77,20 @@ class Scheduler():
         time = self.due_date
 
         # Iterations over tasks
-        for index, task in enumerate(first_part):
+        for task in first_part:
             time -= task['p']
             if time < 0:
                 time -= task['p']
                 break
 
             ordered.append(task)
-            used_tasks.append(index)
+            used_tasks.append(task['id'])
 
         # Reverse tasks because started from due date
         ordered.reverse()
 
         # Remove used tasks from list and sort it
-        tasks_to_schedule = delete(sorted_tasks, used_tasks)
+        tasks_to_schedule = [task for task in sorted_tasks if task['id'] not in used_tasks]
         sorted_tasks = self.sort_after_due_date(tasks_to_schedule)
 
         # Order tasks after due date
