@@ -1,3 +1,4 @@
+from genetic_scheduler import GeneticScheduler
 from random_scheduler import RandomScheduler
 from scheduler import Scheduler
 from validator import Validator
@@ -73,6 +74,16 @@ def main():
             goal = goal_seq_3
             selected_sequence = seq_3
             start_time = start_time_seq_3
+
+        # Run genetic scheduler
+        genetic = GeneticScheduler(n=n, due_date=due_date)
+        genetic_sequence = genetic.schedule([selected_sequence, selected_sequence])
+        goal_genetic_seq, start_time_genetic_seq = shifter.find_best_shift(tasks=genetic_sequence)
+        if goal_genetic_seq < goal:
+            print('SELECTED GENETIC SEQUENCE')
+            goal = goal_genetic_seq
+            selected_sequence = genetic_sequence
+            start_time = start_time_genetic_seq
 
         # Store best results in file
         writer = Writer()
